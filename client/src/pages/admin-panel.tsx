@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -107,9 +107,15 @@ export default function AdminPanel() {
     }
   };
 
-  // Create plan form
-  const planForm = useForm<z.infer<typeof insertPlanSchema>>({
-    resolver: zodResolver(insertPlanSchema),
+  // Create plan form with enhanced validation
+  const enhancedPlanSchema = insertPlanSchema.extend({
+    price: z.coerce.number().min(0, "Price must be a positive number"),
+    dailyEarning: z.coerce.number().min(0, "Daily earning must be a positive number"),
+    validity: z.coerce.number().int().min(1, "Validity must be at least 1 day"),
+  });
+  
+  const planForm = useForm<z.infer<typeof enhancedPlanSchema>>({
+    resolver: zodResolver(enhancedPlanSchema),
     defaultValues: {
       name: "",
       price: 0,
@@ -626,6 +632,64 @@ export default function AdminPanel() {
                                   value={field.value || ""}
                                 />
                               </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={planForm.control}
+                          name="features"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Features (optional)</FormLabel>
+                              <FormControl>
+                                <div className="space-y-2">
+                                  {Array.isArray(field.value) && field.value.length > 0 ? (
+                                    <div className="space-y-2">
+                                      {field.value.map((feature, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                          <Input
+                                            placeholder={`Feature ${index + 1}`}
+                                            value={feature}
+                                            onChange={(e) => {
+                                              const newFeatures = [...field.value as string[]];
+                                              newFeatures[index] = e.target.value;
+                                              field.onChange(newFeatures);
+                                            }}
+                                          />
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                              const newFeatures = (field.value as string[]).filter((_, i) => i !== index);
+                                              field.onChange(newFeatures);
+                                            }}
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm text-muted-foreground">No features added yet</p>
+                                  )}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      field.onChange([...(Array.isArray(field.value) ? field.value : []), ""]);
+                                    }}
+                                  >
+                                    <Plus className="h-4 w-4 mr-1" /> Add Feature
+                                  </Button>
+                                </div>
+                              </FormControl>
+                              <CardDescription className="mt-1">
+                                Add bullet points to describe the plan's features
+                              </CardDescription>
                               <FormMessage />
                             </FormItem>
                           )}
