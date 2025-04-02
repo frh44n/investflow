@@ -419,6 +419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(enrichedTransactions);
     } catch (error) {
+      console.error("Error fetching pending transactions:", error);
       res.status(500).json({ message: "Error fetching pending transactions" });
     }
   });
@@ -488,6 +489,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get user details for transaction verification (admin only)
+  app.get("/api/admin/user-details/:userId", isAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Return user details without password
+      const { password, ...userDetails } = user;
+      res.json(userDetails);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      res.status(500).json({ message: "Error fetching user details" });
+    }
+  });
+
   // Get all users (admin only)
   app.get("/api/admin/users", isAdmin, async (req, res) => {
     try {

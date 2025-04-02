@@ -13,10 +13,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plan, Transaction, insertPlanSchema, User } from "@shared/schema";
-import { Check, Cross, Pencil, Plus, Trash, X } from "lucide-react";
+import { Check, Cross, Pencil, Plus, Trash, X, Info, Eye, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
+// Extended transaction type for admin panel that includes username
+type EnrichedTransaction = Transaction & {
+  username: string;
+  email: string;
+};
 
 export default function AdminPanel() {
   const { user } = useAuth();
@@ -32,7 +40,7 @@ export default function AdminPanel() {
   }
 
   // Fetch pending transactions
-  const { data: pendingTransactions, isLoading: isLoadingTransactions } = useQuery<Transaction[]>({
+  const { data: pendingTransactions, isLoading: isLoadingTransactions } = useQuery<EnrichedTransaction[]>({
     queryKey: ["/api/admin/transactions/pending"],
     refetchInterval: 10000, // Refetch every 10 seconds
   });
@@ -47,11 +55,14 @@ export default function AdminPanel() {
     queryKey: ["/api/plans"],
   });
 
-  // For admin notes
+  // For admin notes and transaction details
   const [adminNote, setAdminNote] = useState<string>("");
   const [selectedTransaction, setSelectedTransaction] = useState<number | null>(null);
   const [showNoteDialog, setShowNoteDialog] = useState<boolean>(false);
   const [actionType, setActionType] = useState<'approve' | 'reject'>('approve');
+  const [showTransactionDetails, setShowTransactionDetails] = useState<boolean>(false);
+  const [transactionDetails, setTransactionDetails] = useState<Transaction | null>(null);
+  const [userDetails, setUserDetails] = useState<User | null>(null);
 
   // Approve/Reject transaction mutation
   const transactionMutation = useMutation({
@@ -232,6 +243,26 @@ export default function AdminPanel() {
       withdrawalWallet: user.withdrawalWallet,
     });
   };
+  
+  // Handle viewing transaction details
+  const handleViewTransactionDetails = async (transaction: EnrichedTransaction) => {
+    setTransactionDetails(transaction);
+    
+    try {
+      // Fetch user details
+      const res = await apiRequest("GET", `/api/admin/user-details/${transaction.userId}`);
+      const userData = await res.json();
+      setUserDetails(userData);
+      setShowTransactionDetails(true);
+    } catch (error) {
+      console.error("Error loading user details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load user details",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen p-6 bg-gray-100">
@@ -273,20 +304,27 @@ export default function AdminPanel() {
                     </TableHeader>
                     <TableBody>
                       {pendingTransactions.map((transaction) => (
-                        <TableRow key={transaction.id}>
+                        <TableRow 
+                          key={transaction.id} 
+                          className="cursor-pointer hover:bg-gray-50"
+                          onClick={() => handleViewTransactionDetails(transaction)}
+                        >
                           <TableCell>{transaction.id}</TableCell>
-                          <TableCell>{transaction.userId}</TableCell>
+                          <TableCell>{transaction.username}</TableCell>
                           <TableCell className="capitalize">{transaction.type}</TableCell>
                           <TableCell>${transaction.amount.toFixed(2)}</TableCell>
                           <TableCell>{transaction.reference || "-"}</TableCell>
                           <TableCell>{new Date(transaction.createdAt).toLocaleString()}</TableCell>
-                          <TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
                             <div className="flex space-x-2">
                               <Button
                                 size="sm"
                                 variant="default"
                                 className="bg-green-600 hover:bg-green-700"
-                                onClick={() => handleTransactionAction(transaction.id, 'approve')}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTransactionAction(transaction.id, 'approve');
+                                }}
                                 disabled={transactionMutation.isPending}
                               >
                                 <Check className="h-4 w-4 mr-1" /> Approve
@@ -294,7 +332,10 @@ export default function AdminPanel() {
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                onClick={() => handleTransactionAction(transaction.id, 'reject')}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTransactionAction(transaction.id, 'reject');
+                                }}
                                 disabled={transactionMutation.isPending}
                               >
                                 <X className="h-4 w-4 mr-1" /> Reject
@@ -579,7 +620,11 @@ export default function AdminPanel() {
                             <FormItem>
                               <FormLabel>Description (optional)</FormLabel>
                               <FormControl>
-                                <Input placeholder="Short description of the plan" {...field} />
+                                <Input 
+                                  placeholder="Short description of the plan"
+                                  {...field} 
+                                  value={field.value || ""}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -650,6 +695,190 @@ export default function AdminPanel() {
               {transactionMutation.isPending ? "Processing..." : actionType === 'approve' ? "Approve" : "Reject"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Transaction Details Dialog */}
+      <Dialog open={showTransactionDetails} onOpenChange={setShowTransactionDetails}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Info className="mr-2 h-5 w-5 text-blue-500" />
+              Transaction Details
+            </DialogTitle>
+            <DialogDescription>
+              Detailed information about the transaction and user account
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {transactionDetails && userDetails ? (
+              <>
+                {/* Transaction Info */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Transaction Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Transaction ID:</span>
+                        <span className="font-medium">{transactionDetails.id}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Type:</span>
+                        <Badge className="capitalize">
+                          {transactionDetails.type}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Amount:</span>
+                        <span className="font-medium text-green-600">${transactionDetails.amount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Status:</span>
+                        <Badge variant={transactionDetails.status === 'pending' ? 'outline' : 
+                                          transactionDetails.status === 'completed' ? 'default' : 'destructive'}>
+                          {transactionDetails.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Date:</span>
+                        <span className="font-medium">{new Date(transactionDetails.createdAt).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Reference:</span>
+                        <span className="font-medium">{transactionDetails.reference || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Details:</span>
+                        <span className="font-medium">{transactionDetails.details || "N/A"}</span>
+                      </div>
+                      {transactionDetails.adminNote && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Admin Note:</span>
+                          <span className="font-medium">{transactionDetails.adminNote}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                {/* User Info */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">User Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">User ID:</span>
+                        <span className="font-medium">{userDetails.id}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Username:</span>
+                        <span className="font-medium">{userDetails.username}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Email:</span>
+                        <span className="font-medium">{userDetails.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Mobile:</span>
+                        <span className="font-medium">{userDetails.mobile || "N/A"}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2 border-l pl-4">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Deposit Wallet:</span>
+                        <span className="font-medium text-blue-600">${userDetails.depositWallet.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Withdrawal Wallet:</span>
+                        <span className="font-medium text-blue-600">${userDetails.withdrawalWallet.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Total Withdrawals:</span>
+                        <span className="font-medium">${userDetails.totalWithdrawals.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Referred By:</span>
+                        <span className="font-medium">{userDetails.referredBy || "None"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Transaction-specific Details */}
+                {transactionDetails.type === 'withdrawal' && transactionDetails.details && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Withdrawal Details</h3>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        {(() => {
+                          try {
+                            const details = JSON.parse(transactionDetails.details);
+                            return (
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Payment Method:</span>
+                                  <span className="font-medium">{details.paymentMethod || "N/A"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Account Details:</span>
+                                  <span className="font-medium">{details.accountDetails || "N/A"}</span>
+                                </div>
+                              </div>
+                            );
+                          } catch (e) {
+                            return <p>Could not parse withdrawal details</p>;
+                          }
+                        })()}
+                      </div>
+                    </div>
+                  </>
+                )}
+                
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowTransactionDetails(false)}
+                  >
+                    Close
+                  </Button>
+                  
+                  {transactionDetails.status === 'pending' && (
+                    <>
+                      <Button 
+                        variant="default"
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => {
+                          setShowTransactionDetails(false);
+                          handleTransactionAction(transactionDetails.id, 'approve');
+                        }}
+                      >
+                        <Check className="h-4 w-4 mr-1" /> Approve
+                      </Button>
+                      <Button 
+                        variant="destructive"
+                        onClick={() => {
+                          setShowTransactionDetails(false);
+                          handleTransactionAction(transactionDetails.id, 'reject');
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-1" /> Reject
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-6">
+                <div className="animate-pulse">Loading user details...</div>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
