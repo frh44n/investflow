@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Plan } from "@shared/schema";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface InvestmentPlansProps {
@@ -117,28 +117,45 @@ export default function InvestmentPlans({ onSelectPlan }: InvestmentPlansProps) 
             </div>
           </div>
           <CardContent className="p-5">
-            <div className="text-sm font-medium text-center mb-3">
-              Daily Earning: <span className="text-success">${plan.dailyEarning.toFixed(2)}</span>
+            <div className="flex justify-center items-center space-x-1 mb-5">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                ${plan.dailyEarning.toFixed(2)}/day
+              </div>
             </div>
             <ul className="space-y-3">
               {plan.features?.map((feature, index) => (
-                <li key={index} className="flex items-center">
-                  <CheckCircle2 className="text-success mr-2 h-4 w-4" />
+                <li key={index} className="flex items-center text-sm">
+                  <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2 flex-shrink-0">
+                    <CheckCircle2 className="text-green-600 h-3.5 w-3.5" />
+                  </div>
                   <span>{feature}</span>
                 </li>
               ))}
               {(!plan.features || plan.features.length === 0) && (
                 <>
-                  <li className="flex items-center">
-                    <CheckCircle2 className="text-success mr-2 h-4 w-4" />
+                  <li className="flex items-center text-sm">
+                    <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2 flex-shrink-0">
+                      <CheckCircle2 className="text-green-600 h-3.5 w-3.5" />
+                    </div>
                     <span>Daily earnings for {plan.validity} days</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle2 className="text-success mr-2 h-4 w-4" />
+                  <li className="flex items-center text-sm">
+                    <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2 flex-shrink-0">
+                      <CheckCircle2 className="text-green-600 h-3.5 w-3.5" />
+                    </div>
                     <span>Full investment management</span>
                   </li>
-                  <li className="flex items-center">
-                    <CheckCircle2 className="text-success mr-2 h-4 w-4" />
+                  <li className="flex items-center text-sm">
+                    <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2 flex-shrink-0">
+                      <CheckCircle2 className="text-green-600 h-3.5 w-3.5" />
+                    </div>
+                    <span>Total return: ${(plan.dailyEarning * plan.validity).toFixed(2)}</span>
+                  </li>
+                  <li className="flex items-center text-sm">
+                    <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2 flex-shrink-0">
+                      <CheckCircle2 className="text-green-600 h-3.5 w-3.5" />
+                    </div>
                     <span>24/7 customer support</span>
                   </li>
                 </>

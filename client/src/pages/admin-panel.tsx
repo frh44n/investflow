@@ -141,7 +141,7 @@ export default function AdminPanel() {
   // Create/Update plan mutation
   const planMutation = useMutation({
     mutationFn: async (plan: z.infer<typeof insertPlanSchema>) => {
-      if (editingPlan) {
+      if (editingPlan && editingPlan.id) {
         const res = await apiRequest("PUT", `/api/plans/${editingPlan.id}`, plan);
         return await res.json();
       } else {
@@ -564,7 +564,8 @@ export default function AdminPanel() {
                             description: "",
                             features: [],
                           });
-                          setEditingPlan({} as Plan);
+                          // Set to null to indicate we're creating a new plan, not editing
+                          setEditingPlan({ id: null } as any);
                         }}
                       >
                         <Plus className="h-4 w-4 mr-1" /> Add New Plan
