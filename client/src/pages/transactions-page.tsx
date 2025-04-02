@@ -114,7 +114,38 @@ export default function TransactionsPage() {
                         <TableCell>
                           <div className="max-w-[250px]">
                             {transaction.details && (
-                              <p className="text-sm text-gray-700 mb-1">{transaction.details}</p>
+                              <p className="text-sm text-gray-700 mb-1">
+                                {(() => {
+                                  try {
+                                    // Try to parse as JSON object
+                                    const details = JSON.parse(transaction.details);
+                                    
+                                    // If it's a payment method with account details
+                                    if (details.paymentMethod && details.accountDetails) {
+                                      if (typeof details.accountDetails === 'object') {
+                                        // Just show payment method with generic account info
+                                        return `${details.paymentMethod} (Account details provided)`;
+                                      } else {
+                                        // Show both payment method and account details
+                                        return `${details.paymentMethod}: ${details.accountDetails}`;
+                                      }
+                                    } else {
+                                      // For other objects, create a formatted string
+                                      return Object.entries(details)
+                                        .map(([key, value]) => {
+                                          if (typeof value === 'object') {
+                                            return `${key}: [details]`;
+                                          }
+                                          return `${key}: ${value}`;
+                                        })
+                                        .join(', ');
+                                    }
+                                  } catch (e) {
+                                    // If not valid JSON, just return the original string
+                                    return transaction.details;
+                                  }
+                                })()}
+                              </p>
                             )}
                             {transaction.reference && (
                               <p className="text-xs text-gray-500 mb-1">

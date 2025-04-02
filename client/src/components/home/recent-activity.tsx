@@ -118,7 +118,40 @@ export default function RecentActivity() {
                         </span>}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {transaction.details || `Transaction #${transaction.id}`}
+                        {(() => {
+                          if (!transaction.details) {
+                            return `Transaction #${transaction.id}`;
+                          }
+                          
+                          try {
+                            // Check if it's a JSON string and parse it
+                            const detailsObj = JSON.parse(transaction.details);
+                            
+                            // Check if we have a paymentMethod with account details
+                            if (detailsObj.paymentMethod && detailsObj.accountDetails) {
+                              if (typeof detailsObj.accountDetails === 'object') {
+                                // Just show payment method with generic account info text
+                                return `${detailsObj.paymentMethod} (Account details provided)`;
+                              } else {
+                                // Show both payment method and account details as text
+                                return `${detailsObj.paymentMethod}: ${detailsObj.accountDetails}`;
+                              }
+                            } else {
+                              // Return simplified representation of the object
+                              return Object.entries(detailsObj)
+                                .map(([key, value]) => {
+                                  if (typeof value === 'object') {
+                                    return `${key}: [details]`;
+                                  }
+                                  return `${key}: ${value}`;
+                                })
+                                .join(', ');
+                            }
+                          } catch (error) {
+                            // If it's not JSON, just return the string
+                            return transaction.details;
+                          }
+                        })()}
                       </p>
                       {transaction.adminNote && (
                         <p className="text-xs italic text-gray-500 mt-1">

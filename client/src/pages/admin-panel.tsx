@@ -826,7 +826,19 @@ export default function AdminPanel() {
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-500">Account Details:</span>
-                                  <span className="font-medium">{details.accountDetails || "N/A"}</span>
+                                  <span className="font-medium">
+                                    {(() => {
+                                      if (!details.accountDetails) return "N/A";
+                                      
+                                      if (typeof details.accountDetails === 'object') {
+                                        return Object.entries(details.accountDetails)
+                                          .map(([key, value]) => `${key}: ${value}`)
+                                          .join(', ');
+                                      }
+                                      
+                                      return details.accountDetails;
+                                    })()}
+                                  </span>
                                 </div>
                               </div>
                             );
