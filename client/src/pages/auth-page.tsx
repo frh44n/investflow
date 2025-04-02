@@ -176,128 +176,129 @@ export default function AuthPage() {
             </form>
           </Form>
         ) : (
-          <Form {...registerForm}>
-            <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="mt-8 space-y-6">
-              <FormField
-                control={registerForm.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Choose a username"
-                        {...field}
-                        autoComplete="username"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email address</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        {...field}
-                        autoComplete="email"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="mobile"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mobile number</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="tel"
-                        placeholder="Enter your mobile number"
-                        {...field}
-                        autoComplete="tel"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Create a password"
-                        {...field}
-                        autoComplete="new-password"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Confirm your password"
-                        {...field}
-                        autoComplete="new-password"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={registerForm.control}
-                name="invitationCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Invitation code (optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter invitation code if you have one"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? "Creating account..." : "Create account"}
-              </Button>
+          <div className="mt-8 space-y-6">
+            <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)}>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label htmlFor="username" className="block text-sm font-medium">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-2 border"
+                    placeholder="Choose a username"
+                    {...registerForm.register("username")}
+                  />
+                  {registerForm.formState.errors.username && (
+                    <p className="text-sm text-red-500">
+                      {registerForm.formState.errors.username.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <label htmlFor="email" className="block text-sm font-medium">
+                    Email address
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-2 border"
+                    placeholder="Enter your email"
+                    {...registerForm.register("email")}
+                  />
+                  {registerForm.formState.errors.email && (
+                    <p className="text-sm text-red-500">
+                      {registerForm.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <label htmlFor="mobile" className="block text-sm font-medium">
+                    Mobile number
+                  </label>
+                  <input
+                    id="mobile"
+                    type="tel"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-2 border"
+                    placeholder="Enter your mobile number"
+                    {...registerForm.register("mobile")}
+                  />
+                  {registerForm.formState.errors.mobile && (
+                    <p className="text-sm text-red-500">
+                      {registerForm.formState.errors.mobile.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <label htmlFor="password" className="block text-sm font-medium">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-2 border"
+                    placeholder="Create a password"
+                    {...registerForm.register("password")}
+                  />
+                  {registerForm.formState.errors.password && (
+                    <p className="text-sm text-red-500">
+                      {registerForm.formState.errors.password.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium">
+                    Confirm password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-2 border"
+                    placeholder="Confirm your password"
+                    {...registerForm.register("confirmPassword")}
+                  />
+                  {registerForm.formState.errors.confirmPassword && (
+                    <p className="text-sm text-red-500">
+                      {registerForm.formState.errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-1">
+                  <label htmlFor="invitationCode" className="block text-sm font-medium">
+                    Invitation code (optional)
+                  </label>
+                  <input
+                    id="invitationCode"
+                    type="text"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-base p-2 border"
+                    placeholder="Enter invitation code if you have one"
+                    {...registerForm.register("invitationCode")}
+                  />
+                  {registerForm.formState.errors.invitationCode && (
+                    <p className="text-sm text-red-500">
+                      {registerForm.formState.errors.invitationCode.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={registerMutation.isPending}
+                >
+                  {registerMutation.isPending ? "Creating account..." : "Create account"}
+                </Button>
+              </div>
             </form>
-          </Form>
+          </div>
         )}
 
         <div className="mt-6">
