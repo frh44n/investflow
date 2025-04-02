@@ -26,9 +26,14 @@ const loginSchema = z.object({
 
 type LoginData = z.infer<typeof loginSchema>;
 
-// Registration schema from shared schema
-const registerSchema = insertUserSchema.extend({
+// Registration schema with additional validations
+const registerSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email"),
+  mobile: z.string().min(10, "Please enter a valid mobile number"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
+  invitationCode: z.string().optional(),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -73,9 +78,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData) => {
-      // Remove confirmPassword as it's not needed in the API
-      const { confirmPassword, ...credentials } = data;
-      const res = await apiRequest("POST", "/api/register", credentials);
+      // Remove confirmPassword and transform invitationCode to referredBy if needed
+      const { confirmPassword, invitationCode, ...credentials } = data;
+      
+      // Create API request payload
+      const apiPayload = {
+        ...credentials,
+        // Only add referredBy if invitationCode is provided and non-empty
+        ...(invitationCode ? { referredBy: parseInt(invitationCode) || null } : {})
+      };
+      
+      const res = await apiRequest("POST", "/api/register", apiPayload);
       return await res.json();
     },
     onSuccess: (user: User) => {

@@ -18,7 +18,7 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
-// Registration schema
+// Registration schema - align with the one in use-auth.tsx
 const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Please enter a valid email"),
