@@ -23,7 +23,7 @@ export default function MenuOptions() {
       icon: <ReceiptText className="text-gray-500 h-5 w-5" />,
       title: "Transaction History",
       description: "View all your deposits, withdrawals and earnings",
-      onClick: () => {}, // This would be implemented with a proper route
+      onClick: () => navigate("/transactions"),
     },
     {
       icon: <ShoppingBag className="text-gray-500 h-5 w-5" />,

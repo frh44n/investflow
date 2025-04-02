@@ -83,7 +83,9 @@ export const transactions = pgTable("transactions", {
   status: text("status").notNull(), // pending, completed, rejected
   details: text("details"),
   reference: text("reference"), // UTR or other reference number
+  adminNote: text("admin_note"), // Admin's note when approving/rejecting
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at"),
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).pick({
@@ -93,6 +95,7 @@ export const insertTransactionSchema = createInsertSchema(transactions).pick({
   status: true,
   details: true,
   reference: true,
+  adminNote: true,
 });
 
 // Export types

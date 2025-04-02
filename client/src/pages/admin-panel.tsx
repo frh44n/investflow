@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,10 +47,16 @@ export default function AdminPanel() {
     queryKey: ["/api/plans"],
   });
 
+  // For admin notes
+  const [adminNote, setAdminNote] = useState<string>("");
+  const [selectedTransaction, setSelectedTransaction] = useState<number | null>(null);
+  const [showNoteDialog, setShowNoteDialog] = useState<boolean>(false);
+  const [actionType, setActionType] = useState<'approve' | 'reject'>('approve');
+
   // Approve/Reject transaction mutation
   const transactionMutation = useMutation({
-    mutationFn: async ({ id, action }: { id: number, action: 'approve' | 'reject' }) => {
-      const res = await apiRequest("POST", `/api/admin/transactions/${id}/${action}`, {});
+    mutationFn: async ({ id, action, adminNote }: { id: number, action: 'approve' | 'reject', adminNote?: string }) => {
+      const res = await apiRequest("POST", `/api/admin/transactions/${id}/${action}`, { adminNote });
       return await res.json();
     },
     onSuccess: () => {
@@ -57,6 +65,9 @@ export default function AdminPanel() {
         title: "Success",
         description: "Transaction status updated successfully",
       });
+      setShowNoteDialog(false);
+      setAdminNote("");
+      setSelectedTransaction(null);
     },
     onError: (error) => {
       toast({
@@ -66,6 +77,24 @@ export default function AdminPanel() {
       });
     },
   });
+  
+  // Handle transaction action with notes
+  const handleTransactionAction = (id: number, action: 'approve' | 'reject') => {
+    setSelectedTransaction(id);
+    setActionType(action);
+    setShowNoteDialog(true);
+  };
+  
+  // Submit transaction with note
+  const submitTransactionWithNote = () => {
+    if (selectedTransaction) {
+      transactionMutation.mutate({ 
+        id: selectedTransaction, 
+        action: actionType,
+        adminNote: adminNote.trim() || undefined
+      });
+    }
+  };
 
   // Create plan form
   const planForm = useForm<z.infer<typeof insertPlanSchema>>({
@@ -257,7 +286,7 @@ export default function AdminPanel() {
                                 size="sm"
                                 variant="default"
                                 className="bg-green-600 hover:bg-green-700"
-                                onClick={() => transactionMutation.mutate({ id: transaction.id, action: 'approve' })}
+                                onClick={() => handleTransactionAction(transaction.id, 'approve')}
                                 disabled={transactionMutation.isPending}
                               >
                                 <Check className="h-4 w-4 mr-1" /> Approve
@@ -265,7 +294,7 @@ export default function AdminPanel() {
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                onClick={() => transactionMutation.mutate({ id: transaction.id, action: 'reject' })}
+                                onClick={() => handleTransactionAction(transaction.id, 'reject')}
                                 disabled={transactionMutation.isPending}
                               >
                                 <X className="h-4 w-4 mr-1" /> Reject
@@ -581,6 +610,48 @@ export default function AdminPanel() {
           </TabsContent>
         </Tabs>
       </div>
+    
+      {/* Admin Note Dialog */}
+      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'approve' ? 'Approve' : 'Reject'} Transaction
+            </DialogTitle>
+            <DialogDescription>
+              Add an optional note to this transaction. This note will be visible in the transaction history.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Textarea
+              placeholder="Optional admin note..."
+              value={adminNote}
+              onChange={(e) => setAdminNote(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNoteDialog(false);
+                setAdminNote("");
+                setSelectedTransaction(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={actionType === 'approve' ? 'default' : 'destructive'}
+              onClick={submitTransactionWithNote}
+              disabled={transactionMutation.isPending}
+              className={actionType === 'approve' ? "bg-green-600 hover:bg-green-700" : ""}
+            >
+              {transactionMutation.isPending ? "Processing..." : actionType === 'approve' ? "Approve" : "Reject"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

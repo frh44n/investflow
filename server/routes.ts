@@ -425,13 +425,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/transactions/:id/:action", isAdmin, async (req, res) => {
     try {
       const { id, action } = req.params;
+      const { adminNote } = req.body;
       const transactionId = parseInt(id);
       
       if (action !== 'approve' && action !== 'reject') {
         return res.status(400).json({ message: "Invalid action" });
       }
       
-      const transaction = await storage.transactions.get(transactionId);
+      const transaction = await storage.getPendingTransactions()
+        .then(txs => txs.find(tx => tx.id === transactionId));
+        
       if (!transaction) {
         return res.status(404).json({ message: "Transaction not found" });
       }
@@ -444,6 +447,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+      
+      const now = new Date();
+      const noteText = adminNote || `${action === 'approve' ? 'Approved' : 'Rejected'} by admin on ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
       
       if (action === 'approve') {
         // Handle approval based on transaction type
@@ -459,8 +465,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // Update transaction status
-        await storage.updateTransactionStatus(transactionId, 'completed');
+        // Update transaction status with admin note
+        await storage.updateTransactionStatus(transactionId, 'completed', noteText);
       } else {
         // Handle rejection
         if (transaction.type === 'withdrawal') {
@@ -470,8 +476,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // Update transaction status
-        await storage.updateTransactionStatus(transactionId, 'rejected');
+        // Update transaction status with admin note
+        await storage.updateTransactionStatus(transactionId, 'rejected', noteText);
       }
       
       res.json({ message: `Transaction ${action}d successfully` });

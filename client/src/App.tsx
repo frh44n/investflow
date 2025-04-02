@@ -11,6 +11,7 @@ import BuyPage from "@/pages/buy-page";
 import TeamPage from "@/pages/team-page";
 import MenuPage from "@/pages/menu-page";
 import AdminPanel from "@/pages/admin-panel";
+import TransactionsPage from "@/pages/transactions-page";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <ProtectedRoute path="/buy" component={BuyPage} />
       <ProtectedRoute path="/team" component={TeamPage} />
       <ProtectedRoute path="/menu" component={MenuPage} />
+      <ProtectedRoute path="/transactions" component={TransactionsPage} />
       <AdminRoute path="/admin" component={AdminPanel} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />

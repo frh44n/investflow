@@ -47,7 +47,7 @@ export interface IStorage {
   // Transactions operations
   getUserTransactions(userId: number): Promise<Transaction[]>;
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
-  updateTransactionStatus(id: number, status: string): Promise<Transaction | undefined>;
+  updateTransactionStatus(id: number, status: string, adminNote?: string): Promise<Transaction | undefined>;
   getPendingTransactions(): Promise<Transaction[]>;
   
   // Referral operations
@@ -245,18 +245,22 @@ export class MemStorage implements IStorage {
       status: insertTransaction.status,
       details: insertTransaction.details || null,
       reference: insertTransaction.reference || null,
+      adminNote: insertTransaction.adminNote || null,
       createdAt: new Date(),
+      updatedAt: null,
     };
     
     this.transactions.set(id, transaction);
     return transaction;
   }
 
-  async updateTransactionStatus(id: number, status: string): Promise<Transaction | undefined> {
+  async updateTransactionStatus(id: number, status: string, adminNote?: string): Promise<Transaction | undefined> {
     const transaction = this.transactions.get(id);
     if (!transaction) return undefined;
     
     transaction.status = status;
+    transaction.updatedAt = new Date();
+    transaction.adminNote = adminNote || null;
     this.transactions.set(id, transaction);
     return transaction;
   }
@@ -596,14 +600,20 @@ export class DatabaseStorage implements IStorage {
       status: insertTransaction.status,
       details: insertTransaction.details || null,
       reference: insertTransaction.reference || null,
+      adminNote: insertTransaction.adminNote || null,
     }).returning();
     
     return result[0] as Transaction;
   }
 
-  async updateTransactionStatus(id: number, status: string): Promise<Transaction | undefined> {
+  async updateTransactionStatus(id: number, status: string, adminNote?: string): Promise<Transaction | undefined> {
+    const now = new Date();
     const result = await db.update(transactions)
-      .set({ status })
+      .set({ 
+        status, 
+        updatedAt: now,
+        adminNote: adminNote
+      })
       .where(eq(transactions.id, id))
       .returning();
     

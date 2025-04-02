@@ -10,6 +10,7 @@ import {
   Users 
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "wouter";
 
 export default function RecentActivity() {
   const { data: transactions, isLoading } = useQuery<Transaction[]>({
@@ -107,11 +108,23 @@ export default function RecentActivity() {
                     </div>
                     <div className="ml-3 flex-1">
                       <p className="text-sm font-medium text-gray-900 capitalize">
-                        {transaction.type}
+                        {transaction.type} {transaction.status !== 'pending' && 
+                        <span className={`text-xs ml-1 px-1.5 py-0.5 rounded-full ${
+                          transaction.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                          transaction.status === 'rejected' ? 'bg-red-100 text-red-800' : 
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {transaction.status}
+                        </span>}
                       </p>
                       <p className="text-sm text-gray-500">
                         {transaction.details || `Transaction #${transaction.id}`}
                       </p>
+                      {transaction.adminNote && (
+                        <p className="text-xs italic text-gray-500 mt-1">
+                          Note: {transaction.adminNote}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-medium ${getAmountColor(transaction.type)}`}>
@@ -131,9 +144,9 @@ export default function RecentActivity() {
         </CardContent>
         {recentTransactions && recentTransactions.length > 0 && (
           <CardFooter className="p-4 bg-gray-50 border-t border-gray-200">
-            <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700 flex justify-center items-center w-full">
+            <Link to="/transactions" className="text-sm font-medium text-primary-600 hover:text-primary-700 flex justify-center items-center w-full">
               View all transactions
-            </a>
+            </Link>
           </CardFooter>
         )}
       </Card>
