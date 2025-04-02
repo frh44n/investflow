@@ -29,22 +29,48 @@ export default function InvestmentPlans({ onSelectPlan }: InvestmentPlansProps) 
   const getBgPattern = (plan: Plan) => {
     const price = plan.price;
     
-    if (price >= 500) return "bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMzAgMEMxMy40MzEgMCAwIDEzLjQzMSAwIDMwYzAgMTYuNTY5IDEzLjQzMSAzMCAzMCAzMCAxNi41NjkgMCAzMC0xMy40MzEgMzAtMzBDNjAgMTMuNDMxIDQ2LjU2OSAwIDMwIDB6TTE0LjY1MyAzMGMwLTguNDg0IDYuODY0LTE1LjM0NyAxNS4zNDctMTUuMzQ3UzQ1LjM0NyAyMS41MTYgNDUuMzQ3IDMwYzAgOC40ODQtNi44NjQgMTUuMzQ3LTE1LjM0NyAxNS4zNDdTMTQuNjUzIDM4LjQ4NCAxNC42NTMgMzB6Ii8+PC9zdmc+')]";
-    if (price >= 200) return "bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNNDggMEgwdjQ4aDQ4VjB6TTI0IDQwYy04LjgzNyAwLTE2LTcuMTYzLTE2LTE2czYuMTYzLTE2IDE2LTE2czE2IDcuMTYzIDE2IDE2cy03LjE2MyAxNi0xNiAxNnoiLz48L3N2Zz4=')]";
-    if (price >= 100) return "bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMTIgMGgzNnY0OEgxMlYwek0wIDEyaDEydjI0SDBWMTJ6Ii8+PC9zdmc+')]";
-    if (price >= 50) return "bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMTggMEMxMC4yMDIgMCA0IDYuMjAyIDQgMTRjMCA3Ljc5OCA2LjIwMiAxNCAxNCAxNHYtN2MtMy45IDAtNy0zLjEtNy03czMuMS03IDctN2MyLjkxNyAwIDUuNDE2IDEuNzc5IDYuNDkzIDQuMzA3bC01LjI0OSA1LjI0OUwzMCAxMi41NTdWMS45OTlDMjcuMDQzLjc0OSAyMy42NzUgMCAyMCAwSDR6TTE4IDMyYy03LjczMiAwLTE0LTYuMjY4LTE0LTE0IDAtMi41NTEuNjk0LTQuOTM1IDEuODg5LTcuMDA0TDAgMTMuNTU5VjI2YzAgNS41MjMgNC40NzcgMTAgMTAgMTBoOHYtNHoiLz48L3N2Zz4=')]";
-    return "bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMCAwaDI0djI0SDBWMHptMjAgNEg0djE2aDE2VjR6Ii8+PC9zdmc+')]";
+    if (price >= 500) {
+      // Diamond/Premium Plan
+      return "bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.0.3')] bg-center";
+    }
+    if (price >= 200) {
+      // Enterprise Plan
+      return "bg-[url('https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3')] bg-center";
+    }
+    if (price >= 100) {
+      // Professional Plan
+      return "bg-[url('https://images.unsplash.com/photo-1617653202545-c9e606ff581a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3')] bg-center";
+    }
+    if (price >= 50) {
+      // Standard Plan
+      return "bg-[url('https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3')] bg-center";
+    }
+    // Starter Plan
+    return "bg-[url('https://images.unsplash.com/photo-1640340434855-6084b1f4901c?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.0.3')] bg-center";
   };
 
   // Function to generate button styles for plan
   const getButtonStyles = (plan: Plan) => {
     const price = plan.price;
     
-    if (price >= 500) return "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white";
-    if (price >= 200) return "bg-gradient-to-r from-gray-800 to-gray-900 hover:from-black hover:to-gray-800 text-white";
-    if (price >= 100) return "bg-gradient-to-r from-primary-600 to-secondary-500 hover:from-primary-700 hover:to-secondary-600 text-white";
-    if (price >= 50) return "bg-gradient-to-r from-secondary-600 to-purple-600 hover:from-secondary-700 hover:to-purple-700 text-white";
-    return "bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white";
+    if (price >= 500) {
+      // Diamond/Premium Plan - gold
+      return "bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-black font-semibold shadow-md";
+    }
+    if (price >= 200) {
+      // Enterprise Plan - dark elegant
+      return "bg-gradient-to-r from-gray-800 to-gray-900 hover:from-black hover:to-gray-800 text-white font-semibold shadow-md";
+    }
+    if (price >= 100) {
+      // Professional Plan - purple/violet
+      return "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold shadow-md";
+    }
+    if (price >= 50) {
+      // Standard Plan - green
+      return "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold shadow-md";
+    }
+    // Starter Plan - blue
+    return "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-md";
   };
 
   if (isLoading) {
@@ -75,12 +101,19 @@ export default function InvestmentPlans({ onSelectPlan }: InvestmentPlansProps) 
     <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {plans?.map((plan) => (
         <Card key={plan.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-          <div className={`p-5 ${getGradient(plan)} ${getBgPattern(plan)} bg-blend-overlay text-white text-center relative`}>
+          <div className={`h-48 ${getBgPattern(plan)} bg-cover bg-blend-overlay text-white text-center relative`}>
+            {/* Dark overlay to make text readable */}
+            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+            {/* Colorful gradient at the top */}
+            <div className={`absolute inset-0 ${getGradient(plan)} opacity-40`}></div>
+            {/* Pattern overlay */}
             <div className="absolute inset-0 opacity-10 bg-pattern"></div>
-            <div className="relative z-10">
-              <h3 className="text-xl font-bold">{plan.name}</h3>
-              <div className="mt-2 text-3xl font-bold">${plan.price.toFixed(2)}</div>
-              <p className="mt-1 text-sm opacity-80">{plan.validity} Days</p>
+            <div className="relative z-10 flex flex-col justify-center items-center h-full p-5">
+              <div className="bg-black bg-opacity-30 py-1 px-4 rounded-full mb-2">
+                <h3 className="text-xl font-bold">{plan.name}</h3>
+              </div>
+              <div className="mt-2 text-4xl font-bold text-white drop-shadow-md">${plan.price.toFixed(2)}</div>
+              <p className="mt-1 text-sm opacity-90 bg-black bg-opacity-30 py-1 px-3 rounded-full">{plan.validity} Days</p>
             </div>
           </div>
           <CardContent className="p-5">

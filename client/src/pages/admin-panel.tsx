@@ -108,10 +108,22 @@ export default function AdminPanel() {
   };
 
   // Create plan form with enhanced validation
-  const enhancedPlanSchema = insertPlanSchema.extend({
-    price: z.coerce.number().min(0, "Price must be a positive number"),
-    dailyEarning: z.coerce.number().min(0, "Daily earning must be a positive number"),
-    validity: z.coerce.number().int().min(1, "Validity must be at least 1 day"),
+  const enhancedPlanSchema = z.object({
+    name: z.string().min(1, "Plan name is required"),
+    price: z.preprocess(
+      (val) => (val === '' ? 0 : Number(val)), 
+      z.number().min(0, "Price must be a positive number")
+    ),
+    dailyEarning: z.preprocess(
+      (val) => (val === '' ? 0 : Number(val)), 
+      z.number().min(0, "Daily earning must be a positive number")
+    ),
+    validity: z.preprocess(
+      (val) => (val === '' ? 0 : Number(val)), 
+      z.number().int().min(1, "Validity must be at least 1 day")
+    ),
+    description: z.string().optional(),
+    features: z.array(z.string()).optional(),
   });
   
   const planForm = useForm<z.infer<typeof enhancedPlanSchema>>({
@@ -217,8 +229,18 @@ export default function AdminPanel() {
   });
 
   // Handle plan form submission
-  const onPlanSubmit = (data: z.infer<typeof insertPlanSchema>) => {
-    planMutation.mutate(data);
+  const onPlanSubmit = (data: z.infer<typeof enhancedPlanSchema>) => {
+    // Convert numeric strings to numbers to match the API schema
+    const formattedData = {
+      name: data.name,
+      price: Number(data.price),
+      dailyEarning: Number(data.dailyEarning),
+      validity: Number(data.validity),
+      description: data.description || "",
+      features: data.features || [],
+    };
+    
+    planMutation.mutate(formattedData);
   };
 
   // Handle user form submission
