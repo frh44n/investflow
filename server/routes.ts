@@ -412,7 +412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return {
             ...tx,
             username: user?.username || "Unknown",
-            email: user?.email || "Unknown"
+            email: typeof user?.email === 'string' ? user.email : "Unknown"
           };
         })
       );

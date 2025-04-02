@@ -310,7 +310,7 @@ export default function AdminPanel() {
                           onClick={() => handleViewTransactionDetails(transaction)}
                         >
                           <TableCell>{transaction.id}</TableCell>
-                          <TableCell>{transaction.username}</TableCell>
+                          <TableCell>{typeof transaction.username === 'string' ? transaction.username : "Unknown"}</TableCell>
                           <TableCell className="capitalize">{transaction.type}</TableCell>
                           <TableCell>${transaction.amount.toFixed(2)}</TableCell>
                           <TableCell>{transaction.reference || "-"}</TableCell>
@@ -776,11 +776,11 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Username:</span>
-                        <span className="font-medium">{userDetails.username}</span>
+                        <span className="font-medium">{typeof userDetails.username === 'string' ? userDetails.username : "Unknown"}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Email:</span>
-                        <span className="font-medium">{userDetails.email}</span>
+                        <span className="font-medium">{typeof userDetails.email === 'string' ? userDetails.email : "Unknown"}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Mobile:</span>
@@ -802,7 +802,7 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Referred By:</span>
-                        <span className="font-medium">{userDetails.referredBy || "None"}</span>
+                        <span className="font-medium">{typeof userDetails.referredBy === 'string' ? userDetails.referredBy : "None"}</span>
                       </div>
                     </div>
                   </div>
