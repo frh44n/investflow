@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { insertPlanSchema, insertTransactionSchema, Plan, User } from "@shared/schema";
+import * as schema from "@shared/schema";
+import { db } from "./db";
 import { addDays } from "date-fns";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
@@ -489,13 +491,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all users (admin only)
   app.get("/api/admin/users", isAdmin, async (req, res) => {
     try {
-      const users = Array.from(storage.users.values());
+      // Get all users from the database
+      const users = await db.select().from(schema.users);
       
-      // Remove passwords
+      // Remove passwords for security
       const safeUsers = users.map(({ password, ...user }) => user);
       
       res.json(safeUsers);
     } catch (error) {
+      console.error("Error fetching users:", error);
       res.status(500).json({ message: "Error fetching users" });
     }
   });
