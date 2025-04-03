@@ -61,61 +61,74 @@ export default function MenuOptions() {
   }
 
   return (
-    <div className="mt-8 space-y-3">
-      {options.map((option, index) => (
-        <Card 
-          key={index}
-          className="shadow-sm hover:bg-gray-50 cursor-pointer transition-colors"
-          onClick={option.onClick}
+    <>
+      <div className="mt-8 space-y-3">
+        {options.map((option, index) => (
+          <Card 
+            key={index}
+            className="shadow-sm hover:bg-gray-50 cursor-pointer transition-colors"
+            onClick={option.onClick}
+          >
+            <div className="px-4 py-4 sm:px-6 flex items-center">
+              <div className="min-w-0 flex-1 flex items-center">
+                <div className="flex-shrink-0">
+                  {option.icon}
+                </div>
+                <div className="min-w-0 flex-1 px-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {option.title}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {option.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+          </Card>
+        ))}
+
+        <button
+          onClick={handleLogout}
+          disabled={logoutMutation.isPending}
+          className="w-full block bg-white shadow-sm rounded-lg overflow-hidden hover:bg-gray-50 text-left transition-colors"
         >
           <div className="px-4 py-4 sm:px-6 flex items-center">
             <div className="min-w-0 flex-1 flex items-center">
               <div className="flex-shrink-0">
-                {option.icon}
+                <LogOut className="text-red-500 h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1 px-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {option.title}
+                  <p className="text-sm font-medium text-red-500 truncate">
+                    {logoutMutation.isPending ? "Logging out..." : "Logout"}
                   </p>
                   <p className="text-sm text-gray-500 truncate">
-                    {option.description}
+                    Sign out of your account
                   </p>
                 </div>
               </div>
             </div>
-            <div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
           </div>
-        </Card>
-      ))}
-
-      <button
-        onClick={handleLogout}
-        disabled={logoutMutation.isPending}
-        className="w-full block bg-white shadow-sm rounded-lg overflow-hidden hover:bg-gray-50 text-left transition-colors"
-      >
-        <div className="px-4 py-4 sm:px-6 flex items-center">
-          <div className="min-w-0 flex-1 flex items-center">
-            <div className="flex-shrink-0">
-              <LogOut className="text-red-500 h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1 px-4">
-              <div>
-                <p className="text-sm font-medium text-red-500 truncate">
-                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
-                </p>
-                <p className="text-sm text-gray-500 truncate">
-                  Sign out of your account
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </button>
-    </div>
+        </button>
+      </div>
+      
+      {/* Modals */}
+      <CustomerAssistanceModal
+        open={showCustomerAssistance}
+        onClose={() => setShowCustomerAssistance(false)}
+      />
+      
+      <AccountSettingsModal
+        open={showAccountSettings}
+        onClose={() => setShowAccountSettings(false)}
+      />
+    </>
   );
 }
