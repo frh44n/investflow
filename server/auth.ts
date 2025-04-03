@@ -11,7 +11,10 @@ import { fromZodError } from "zod-validation-error";
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    // Use the User type from schema
+    interface User extends Omit<import('@shared/schema').User, 'password'> {
+      password: string;
+    }
   }
 }
 
@@ -102,13 +105,17 @@ export function setupAuth(app: Express) {
       // Handle invitation code (referral)
       if (validatedData.invitationCode) {
         // Find user with this referral code
-        const referrer = Array.from((await storage.getPlans(), storage.users.values())).find(
-          (user) => user.referralCode === validatedData.invitationCode
-        );
+        const referrer = await storage.getUserByReferralCode(validatedData.invitationCode);
         
         if (referrer) {
           validatedData.referredBy = referrer.id;
+        } else {
+          // If referral code is invalid, set referredBy to null
+          validatedData.referredBy = null;
         }
+      } else {
+        // If no invitation code provided, ensure referredBy is null
+        validatedData.referredBy = null;
       }
       
       // Hash password
