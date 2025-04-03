@@ -116,6 +116,17 @@ export default function MenuOptions() {
           </div>
         </div>
       </button>
+      
+      {/* Modals */}
+      <CustomerAssistanceModal 
+        open={showCustomerAssistance} 
+        onClose={() => setShowCustomerAssistance(false)} 
+      />
+      
+      <AccountSettingsModal 
+        open={showAccountSettings} 
+        onClose={() => setShowAccountSettings(false)} 
+      />
     </div>
   );
 }

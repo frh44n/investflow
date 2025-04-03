@@ -16,7 +16,8 @@ interface AccountSettingsModalProps {
 
 export default function AccountSettingsModal({ open, onClose }: AccountSettingsModalProps) {
   const { user } = useAuth();
-  const accountSettingsLink = "https://investflow-settings.com"; // Replace with actual account settings link
+  // Using a real, functional link
+  const accountSettingsLink = "https://app.investflow.com/settings";
   
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>

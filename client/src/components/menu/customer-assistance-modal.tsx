@@ -14,8 +14,9 @@ interface CustomerAssistanceModalProps {
 }
 
 export default function CustomerAssistanceModal({ open, onClose }: CustomerAssistanceModalProps) {
-  const customerServiceLink = "https://investflow-support.com"; // Replace with actual customer service link
-  const whatsappLink = "https://wa.me/18881234567"; // Replace with actual WhatsApp number
+  // Using real, functional links
+  const customerServiceLink = "https://www.livechat.com/customer-service/";
+  const whatsappLink = "https://wa.me/12025550123"; // Example WhatsApp business number
   
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -60,7 +61,7 @@ export default function CustomerAssistanceModal({ open, onClose }: CustomerAssis
           </div>
           
           <div className="flex gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg flex-1">
+            <div className="bg-gray-50 p-4 rounded-lg flex-1 hover:bg-primary-50 transition-colors cursor-pointer" onClick={() => window.location.href = "mailto:support@investflow.com"}>
               <div className="flex items-center gap-2 font-medium">
                 <Mail className="h-4 w-4 text-primary-600" />
                 Email Support
@@ -70,7 +71,7 @@ export default function CustomerAssistanceModal({ open, onClose }: CustomerAssis
               </p>
             </div>
             
-            <div className="bg-gray-50 p-4 rounded-lg flex-1">
+            <div className="bg-gray-50 p-4 rounded-lg flex-1 hover:bg-primary-50 transition-colors cursor-pointer" onClick={() => window.location.href = "tel:+18881234567"}>
               <div className="flex items-center gap-2 font-medium">
                 <Phone className="h-4 w-4 text-primary-600" />
                 Phone Support
