@@ -39,6 +39,21 @@ export default function AuthPage() {
   const [location, navigate] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
 
+  // Get referral code from URL if present
+  useEffect(() => {
+    // Check if there's a referral code in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const referralCode = urlParams.get('code');
+    
+    if (referralCode) {
+      // Auto switch to registration form if referral code is present
+      setIsLogin(false);
+      
+      // Set the referral code in the form
+      registerForm.setValue('invitationCode', referralCode);
+    }
+  }, []);
+
   // Navigate to home if already logged in
   useEffect(() => {
     if (user) {

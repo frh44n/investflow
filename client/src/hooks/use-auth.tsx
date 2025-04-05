@@ -78,17 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData) => {
-      // Remove confirmPassword and transform invitationCode to referredBy if needed
-      const { confirmPassword, invitationCode, ...credentials } = data;
+      // Remove confirmPassword and use invitationCode directly
+      const { confirmPassword, ...credentials } = data;
       
-      // Create API request payload
-      const apiPayload = {
-        ...credentials,
-        // Only add referredBy if invitationCode is provided and non-empty
-        ...(invitationCode ? { referredBy: parseInt(invitationCode) || null } : {})
-      };
-      
-      const res = await apiRequest("POST", "/api/register", apiPayload);
+      // The server expects invitationCode as a property that it will use
+      // to find the referrer by their referral code      
+      const res = await apiRequest("POST", "/api/register", credentials);
       return await res.json();
     },
     onSuccess: (user: User) => {

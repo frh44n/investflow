@@ -688,9 +688,13 @@ export class DatabaseStorage implements IStorage {
     if (activeInvestments.length > 0) {
       // Get all active plans
       const planIds = activeInvestments.map(inv => inv.planId);
-      const activePlans = await db.select()
-        .from(plans)
-        .where(sqlExpr`${plans.id} IN (${planIds.join(',')})`) as Plan[];
+      
+      // Safely get plans one by one instead of using IN clause
+      const activePlans: Plan[] = [];
+      for (const planId of planIds) {
+        const plan = await this.getPlan(planId);
+        if (plan) activePlans.push(plan);
+      }
       
       // For each active investment, calculate daily earnings
       for (const investment of activeInvestments) {
@@ -703,7 +707,7 @@ export class DatabaseStorage implements IStorage {
           totalAmount += investment.dailyEarning;
           
           // Check last claim date
-          if (investment.lastClaimDate && (!lastClaimDate || investment.lastClaimDate > lastClaimDate)) {
+          if (investment.lastClaimDate && (!lastClaimDate || new Date(investment.lastClaimDate) > new Date(lastClaimDate))) {
             lastClaimDate = investment.lastClaimDate;
           }
         }
@@ -727,8 +731,15 @@ export class DatabaseStorage implements IStorage {
     if (!userExists) throw new Error("User not found");
     
     for (const investment of activeInvestments) {
+      // Function to check if dates are the same day
+      const isSameDay = (date1: Date, date2: Date): boolean => {
+        return date1.getFullYear() === date2.getFullYear() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getDate() === date2.getDate();
+      };
+      
       // Only claim if not claimed today
-      if (!investment.lastClaimDate || !isSameDay(investment.lastClaimDate, today)) {
+      if (!investment.lastClaimDate || !isSameDay(new Date(investment.lastClaimDate), today)) {
         // Update last claim date
         await db.update(userInvestments)
           .set({ lastClaimDate: today })
