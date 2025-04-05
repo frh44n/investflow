@@ -5,6 +5,8 @@ import connectPg from "connect-pg-simple";
 import { randomUUID } from "crypto";
 import { addDays, isSameDay, parseISO } from "date-fns";
 import { eq, and, desc, isNull, asc, sql as sqlExpr } from "drizzle-orm";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Import from schema
 import {
