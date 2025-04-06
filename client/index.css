@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --border: 228 228 231;
+    --background: 255 255 255;
+    --foreground: 0 0 0;
+  }
+}
+
+@layer utilities {
+  .border-border {
+    border-color: rgb(var(--border));
+  }
+
+  .bg-background {
+    background-color: rgb(var(--background));
+  }
+
+  .text-foreground {
+    color: rgb(var(--foreground));
+  }
+}
