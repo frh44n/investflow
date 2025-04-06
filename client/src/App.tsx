@@ -13,7 +13,7 @@ import MenuPage from "@/pages/menu-page";
 import AdminPanel from "@/pages/admin-panel";
 import TransactionsPage from "@/pages/transactions-page";
 import MyInvestmentsPage from "@/pages/my-investments-page";
-
+import './index.css';
 function Router() {
   return (
     <Switch>
