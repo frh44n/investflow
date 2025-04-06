@@ -1,10 +1,19 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
-/* Custom utilities */
+/* Custom utility class defined before Tailwind processes apply rules */
 @layer utilities {
   .border-border {
-    @apply border-gray-200; /* fallback to a default Tailwind color */
+    @apply border-gray-200;
+  }
+
+  .bg-background {
+    @apply bg-white;
+  }
+
+  .text-foreground {
+    @apply text-black;
   }
 }
+
+@tailwind utilities;
